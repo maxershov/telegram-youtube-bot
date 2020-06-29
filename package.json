@@ -1,0 +1,16 @@
+{
+  "name": "telegram-youtube-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "4.17.1",
+    "node-telegram-bot-api": "^0.50.0",
+    "puppeteer-core": "4.0.1"
+  }
+}
