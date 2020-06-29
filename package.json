@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxershov/telegram-youtube-bot.git"
+  },
   "scripts": {
     "start": "node bot.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "express": "4.17.1",
     "node-telegram-bot-api": "^0.50.0",
     "puppeteer-core": "4.0.1"
   }
