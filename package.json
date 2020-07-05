@@ -8,11 +8,12 @@
     "url": "git+https://github.com/maxershov/telegram-youtube-bot.git"
   },
   "scripts": {
-    "start": "node bot.js"
+    "start": "cross-env NTBA_FIX_319=1 node bot.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
     "node-telegram-bot-api": "^0.50.0",
     "puppeteer-core": "4.0.1"
