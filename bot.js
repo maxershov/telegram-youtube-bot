@@ -1,15 +1,17 @@
 const TelegramBot = require("node-telegram-bot-api");
 const puppeteer = require("puppeteer-core");
+require('dotenv').config();
 
 let browser;
 let page;
 
 /* PATH to your chrome browser
-  Comment it and change "puppeteer-core" to "puppeteer" if you want to download chromium browser */
+  Comment it and change "puppeteer-core" to "puppeteer" if you want to download chromium browser 
+*/
 const CHROME_PATH = `C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe`;
+/* YOUR_TELEGRAM_BOT_TOKEN  from @BotFather  */
 
-/* Insert your telegram token from @BotFather */
-const TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
+const TOKEN = process.env.TELEGRAM_API_TOKEN;
 
 
 run();
