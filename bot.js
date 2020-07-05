@@ -2,8 +2,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const puppeteer = require("puppeteer-core");
 require('dotenv').config();
 
-let browser;
-let page;
+let browser, page;
 
 /* PATH to your chrome browser
   Comment it and change "puppeteer-core" to "puppeteer" if you want to download chromium browser 
@@ -18,61 +17,92 @@ run();
 
 async function run() {
   const bot = new TelegramBot(TOKEN, { polling: true });
+  const keyBtns = { "keyboard": [["Следующий трек", "Плейлисты"], ["Перемешать", "Выключить"], ["Громкость -", "Громкость +"]] };
+
 
   browser = await puppeteer.launch({
     executablePath: CHROME_PATH,
     headless: false,
-    defaultViewport: null
+    defaultViewport: null,
+    args: ['--lang=en-GB,en']
   });
-  
+
   page = await browser.newPage();
 
-  await page.goto("https://music.youtube.com/");
+  await page.setExtraHTTPHeaders({ 'Accept-Language': 'en' })
 
-  const keyBtns = { "keyboard": [["Next track"], ["Shuffle", "Turn off"], ["Volume -", "Volume +"]] };
+  await page.goto("https://music.youtube.com/", { waitUntil: 'networkidle0' });
 
-  bot.on("message", (msg) => {
+  const hrefs = await page.$$eval('a', as => as.map(a => {
+    if (a.href && a.title) return ([a.href, `/${a.title.replace(/[^A-Za-z0-9ЁёА-я]/g, '_')}`])
+  }));
+  const links = hrefs.filter(x => x);
+
+
+
+  bot.on("message", async (msg) => {
     const chatId = msg.chat.id;
-    console.log(msg.text);
+    console.log(msg.from.first_name, msg.text);
 
-    switch (msg.text) {
-      case "/start":
-        bot.sendMessage(chatId, `Hello, <b>${msg.from.first_name}</b>`, { parse_mode: "HTML" });
-        bot.sendMessage(chatId, `Send "1" to play next track, "2" to shuffle, "+" "-" to change volume and "0" to turn off`);
-        break;
+    if (msg.text[1].match(new RegExp(/[A-ZЁ-Я]/))) {
+      for (let playlist of links) {
+        if (playlist[1] === msg.text) {
+          bot.sendMessage(chatId, `Включаю ${msg.text}`);
+          await page.goto(playlist[0], { waitUntil: 'networkidle0' });
+          await page.keyboard.press("Tab");
+          await page.keyboard.press("Enter");
+        }
+      }
+    } else {
 
-      case "Next track":
-      case "1":
-        page.keyboard.press("J");
-        bot.sendMessage(chatId, "Next track", { "reply_markup": keyBtns });
-        break;
+      switch (msg.text) {
+        case "/start":
+          bot.sendMessage(chatId, `Привет, <b>${msg.from.first_name}</b>`, { parse_mode: "HTML" });
+          bot.sendMessage(chatId, `/1 для включения следующего трека \n /2 чтобы перемешать \n /3 для переключения плейлиста \n /0 для выключения музыки`, { "reply_markup": keyBtns })
+          break;
 
-      case "Volume -":
-      case "-":
-        page.keyboard.press("-");
-        bot.sendMessage(chatId, "Volume -10", { "reply_markup": keyBtns });
-        break;
+        case "Следующий трек":
+        case "/1":
+          await page.keyboard.press("J");
+          bot.sendMessage(chatId, "Включаю след трек", { "reply_markup": keyBtns });
+          break;
 
-      case "Volume +":
-      case "+":
-        page.keyboard.press("=");
-        bot.sendMessage(chatId, "Volume +10", { "reply_markup": keyBtns });
-        break;
+        case "Громкость -":
+        case "/-":
+          await page.keyboard.press("-");
+          bot.sendMessage(chatId, "Громкость -10", { "reply_markup": keyBtns });
+          break;
 
-      case "Turn off":
-      case "0":
-        process.exit(0);
-        break;
+        case "Громкость +":
+        case "/+":
+          await page.keyboard.press("=");
+          bot.sendMessage(chatId, "Громкость +10", { "reply_markup": keyBtns });
+          break;
 
-      case "Shuffle":
-      case "2":
-        page.keyboard.press("S");
-        bot.sendMessage(chatId, "Shuffle", { "reply_markup": keyBtns });
-        break;
+        case "Выключить":
+        case "/0":
+          process.exit(0);
+          break;
 
-      default:
-        bot.sendMessage(chatId, "Unknown command");
-        bot.sendMessage(chatId, `Send "1" to play next track, "2" to shuffle, "+" "-" to change volume and "0" to turn off`, { "reply_markup": keyBtns });
+        case "Перемешать":
+        case "/2":
+          await page.keyboard.press("S");
+          await page.keyboard.press("J");
+          bot.sendMessage(chatId, "Shuffle..", { "reply_markup": keyBtns });
+          break;
+
+        case "Плейлисты":
+        case "/3":
+
+          bot.sendMessage(chatId,
+            ` ${links.map(link => link[1]).join(`\n \n`)}`
+            , { "reply_markup": keyBtns });
+          break;
+
+        default:
+          bot.sendMessage(chatId, "Неизвестная команда");
+          bot.sendMessage(chatId, `/1 для включения следующего трека \n /2 чтобы перемешать \n /3 для переключения плейлиста \n /0 для выключения музыки`, { "reply_markup": keyBtns })
+      }
     }
   });
 }
