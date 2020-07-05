@@ -8,8 +8,8 @@ let browser, page;
   Comment it and change "puppeteer-core" to "puppeteer" if you want to download chromium browser 
 */
 const CHROME_PATH = `C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe`;
-/* YOUR_TELEGRAM_BOT_TOKEN  from @BotFather  */
 
+/* YOUR_TELEGRAM_BOT_TOKEN  from @BotFather  */
 const TOKEN = process.env.TELEGRAM_API_TOKEN;
 
 
@@ -33,6 +33,7 @@ async function run() {
 
   await page.goto("https://music.youtube.com/", { waitUntil: 'networkidle0' });
 
+  /* get links to playlist from page */
   const hrefs = await page.$$eval('a', as => as.map(a => {
     if (a.href && a.title) return ([a.href, `/${a.title.replace(/[^A-Za-z0-9ЁёА-я]/g, '_')}`])
   }));
@@ -44,6 +45,7 @@ async function run() {
     const chatId = msg.chat.id;
     console.log(msg.from.first_name, msg.text);
 
+    /* check if command starts with Capital letter and find link from hrefs */
     if (msg.text[1].match(new RegExp(/[A-ZЁ-Я]/))) {
       for (let playlist of links) {
         if (playlist[1] === msg.text) {
@@ -64,7 +66,7 @@ async function run() {
         case "Следующий трек":
         case "/1":
           await page.keyboard.press("J");
-          bot.sendMessage(chatId, "Включаю след трек", { "reply_markup": keyBtns });
+          bot.sendMessage(chatId, "Включаю следующий трек", { "reply_markup": keyBtns });
           break;
 
         case "Громкость -":
