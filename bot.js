@@ -22,13 +22,10 @@ async function run() {
   browser = await puppeteer.launch({
     executablePath: CHROME_PATH,
     headless: false,
-    args: [`--window-size=1280,1024`]
+    defaultViewport: null
   });
+  
   page = await browser.newPage();
-  await page.setViewport({
-    width: 1280,
-    height: 1024
-  });
 
   await page.goto("https://music.youtube.com/");
 
