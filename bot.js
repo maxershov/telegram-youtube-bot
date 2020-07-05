@@ -17,7 +17,7 @@ run();
 
 async function run() {
   const bot = new TelegramBot(TOKEN, { polling: true });
-  const keyBtns = { "keyboard": [["Следующий трек", "Плейлисты"], ["Перемешать", "Выключить"], ["Громкость -", "Громкость +"]] };
+  const keyBtns = { "keyboard": [["Следующий трек", "Плейлисты"], ["Перемешать", "Выключить"], ["Громкость -", "Пауза", "Громкость +"]] };
 
 
   browser = await puppeteer.launch({
@@ -79,6 +79,11 @@ async function run() {
         case "/+":
           await page.keyboard.press("=");
           bot.sendMessage(chatId, "Громкость +10", { "reply_markup": keyBtns });
+          break;
+
+        case "Пауза":
+          await page.keyboard.press("Space");
+          bot.sendMessage(chatId, "Пауза", { "reply_markup": keyBtns });
           break;
 
         case "Выключить":
