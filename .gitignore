@@ -125,6 +125,4 @@ host.js
 # VSCode counter ext
 /.VSCodeCounter
 monitor/stats.json
-*.jpg
-*.jpeg
 .vscode/settings.json
