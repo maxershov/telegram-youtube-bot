@@ -33,15 +33,15 @@ async function run() {
 
   await page.goto("https://music.youtube.com/", { waitUntil: 'networkidle0' });
 
-  
+
   // Let's the magic begins
   /** Get all anchors from page, check if it has title and href, add "/" and chg spaces to "_" to send as command in telegram 
    *  "New Songs List" => "/New_Songs_List"
   */
- const links = await page.$$eval('a', a => a.reduce((accumulator, link) => {
-  if (link.href && link.title) accumulator.push([link.href, `/${link.title.replace(/[^A-Za-z0-9ЁёА-я]/g, '_')}`])
-  return accumulator;
-}, []));
+  const links = await page.$$eval('a', a => a.reduce((accumulator, link) => {
+    if (link.href && link.title) accumulator.push([link.href, `/${link.title.replace(/[^A-Za-z0-9ЁёА-я]/g, '_')}`])
+    return accumulator;
+  }, []));
 
 
 
@@ -70,19 +70,27 @@ async function run() {
         case "Следующий трек":
         case "/1":
           await page.keyboard.press("J");
-          bot.sendMessage(chatId, "Включаю следующий трек", { "reply_markup": keyBtns });
+
+          await page.waitForSelector("#layout > ytmusic-player-bar > div.middle-controls.style-scope.ytmusic-player-bar > div.content-info-wrapper.style-scope.ytmusic-player-bar > yt-formatted-string", { timeout: 4000 });
+
+          const song = await page.$eval("#layout > ytmusic-player-bar > div.middle-controls.style-scope.ytmusic-player-bar > div.content-info-wrapper.style-scope.ytmusic-player-bar > yt-formatted-string", el => el.title);
+          const artist = await page.$eval("#layout > ytmusic-player-bar > div.middle-controls.style-scope.ytmusic-player-bar > div.content-info-wrapper.style-scope.ytmusic-player-bar > span > span.subtitle.style-scope.ytmusic-player-bar > yt-formatted-string:nth-child(1)", el => el.title);
+
+          bot.sendMessage(chatId, `Включаю ${artist} - ${song} `, { "reply_markup": keyBtns });
           break;
 
         case "Громкость -":
         case "/-":
           await page.keyboard.press("-");
-          bot.sendMessage(chatId, "Громкость -10", { "reply_markup": keyBtns });
+          const volumeSub = await page.$eval("#expand-volume-slider", el => el.value);
+          bot.sendMessage(chatId, `Громкость ${volumeSub}`, { "reply_markup": keyBtns });
           break;
 
         case "Громкость +":
         case "/+":
           await page.keyboard.press("=");
-          bot.sendMessage(chatId, "Громкость +10", { "reply_markup": keyBtns });
+          const volumeAdd = await page.$eval("#expand-volume-slider", el => el.value);
+          bot.sendMessage(chatId, `Громкость ${volumeAdd}`, { "reply_markup": keyBtns });
           break;
 
         case "Пауза":
