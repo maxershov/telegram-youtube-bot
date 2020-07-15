@@ -33,11 +33,15 @@ async function run() {
 
   await page.goto("https://music.youtube.com/", { waitUntil: 'networkidle0' });
 
-  /* get links to playlist from page */
-  const hrefs = await page.$$eval('a', as => as.map(a => {
-    if (a.href && a.title) return ([a.href, `/${a.title.replace(/[^A-Za-z0-9ЁёА-я]/g, '_')}`])
-  }));
-  const links = hrefs.filter(x => x);
+  
+  // Let's the magic begins
+  /** Get all anchors from page, check if it has title and href, add "/" and chg spaces to "_" to send as command in telegram 
+   *  "New Songs List" => "/New_Songs_List"
+  */
+ const links = await page.$$eval('a', a => a.reduce((accumulator, link) => {
+  if (link.href && link.title) accumulator.push([link.href, `/${link.title.replace(/[^A-Za-z0-9ЁёА-я]/g, '_')}`])
+  return accumulator;
+}, []));
 
 
 
