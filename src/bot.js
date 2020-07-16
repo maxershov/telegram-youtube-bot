@@ -11,9 +11,7 @@ const CHROME_PATH = `C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrom
 const TOKEN = process.env.TELEGRAM_API_TOKEN;
 
 
-run();
-
-async function run() {
+(async function run() {
   const bot = new TelegramBot(TOKEN, { polling: true });
   const MSG_BUTTONS = { "keyboard": [["Следующий трек", "Плейлисты"], ["Перемешать", "Выключить"], ["Громкость -", "Пауза", "Громкость +"]] };
 
@@ -102,7 +100,7 @@ async function run() {
       }
     }
   });
-}
+})();
 
 
 
