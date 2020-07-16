@@ -1,7 +1,7 @@
 # telegram-youtube-bot
 
 <p align="center">
-<img src="https://github.com/maxershov/telegram-youtube-bot/blob/master/screenshots/s0.jpg" width="60%">
+<img src="https://github.com/maxershov/telegram-youtube-bot/blob/master/screenshots/s0.jpg" width="40%">
 </p>
 
 Run chrome browser with Youtube Music and change tracks with telegram bot. Run ```npm i``` and set ```TOKEN``` and ```CHROME_PATH``` in ```bot.js```. Run ```npm start``` to start bot and open browser.
